@@ -1,0 +1,124 @@
+.TH PRCTL 1 "Process operations"
+.SH NAME
+\fBprctl\fP
+- Process operations
+.SH SYNOPSIS
+\fBprctl\fP
+.RB "[\|" \-v "\|]"
+.RB "[\|" \-h|--help "\|]"
+.RB "[\|" \--version "\|]"
+.RB "<\|" \-q|<options....> "\|>"
+.RB "[\|" \c
+.I command\c
+\|]
+.P
+where \fB<options>\fP are:
+.P
+.RB "\|" --unaligned=[silent|signal|always-signal|default] "\|"
+.P
+.RB "\|" --fpemu=[silent|signal|default] "\|"
+.SH DESCRIPTION
+\fBprctl\fP
+allows you to query or control certain process behavior. 
+Supported options are handling of unaligned memory accesses 
+and floating point assistance faults by a process.
+When a process performs an unaligned memory access, by default
+the kernel would emulate the unaligned access correctly and 
+log the unaligned access in syslog. This behavior can be changed 
+so the kernel could either emulate the unaligned access correctly
+without logging an error or send SIGBUS to the process. Similarly
+when a process encounters a floating point assist fault, kernel
+would invoke floating point emulator and log the floating point
+assist fault. This behavior can be changed so the kernel could
+either emulate floating point operation without logging an error or send
+SIGFPE to the offending process.
+.P
+\fBprctl\fP
+can optionally be followed by a command. If a command is specified, 
+\fBprctl\fP 
+will exec the command with the processor behavior
+set to as specified by the options. If a command is not specified,
+\fBprctl\fP 
+will fork a new shell unless the command only queried the current settings.
+The shell started by prctl will be as defined by the environment 
+variable SHELL. If 
+environment variable SHELL is not defined, shell in the password
+entry for the user will be started. If a shell is not found in the password
+entry, bash will be started.
+.SS OPTIONS
+.TP
+\fI-v\fP
+Verbose mode. In verbose mode, any new settings are confirmed with a 
+message on stdout.
+
+.TP
+\fI--help\fP
+Print usage information and exit.
+
+.TP
+\fI--version\fP
+Print software version and exit.
+
+.TP
+\fI-q\fP
+Query the current settings for the process options controllable by prctl.
+
+.TP
+\fI--unaligned=[silent|signal|always-signal|default]]\fP
+Set unaligned memory access behavior to not log the access (\fBsilent\fP), 
+send SIGBUS to the process (\fBsignal\fP), or
+do the default (\fBdefault\fP). On IA-64 architecture an additional 
+value \fBalways-signal\fP is supported which causes a SIGBUS to be 
+generated every time an unaligned access occurs. Refer to the section 
+titled "Memory Datum Alignment and Atomicity" in "Intel IA-64 Architecture 
+Software Developer's Manual: Volume 2" for details on when an unaligned
+access would not generate signal normally. If a value is not specified 
+after "=", current setting is returned.
+
+.TP
+\fI--fpemu=[silent|signal|default]]\fP
+Set floating point assist fault behavior to not log the faulti
+(\fBsilent\fP), send SIGFPE to the process (\fBsignal\fP), or
+do the default (\fBdefault\fP). If a value is not specified after "=", 
+current setting is returned.
+
+.TP
+If an option is specified multiple times, the last one takes effect.
+
+.SH EXAMPLES
+.TP
+.B prctl --unaligned=signal
+starts up a shell (as defined by the environment variable SHELL) and sets 
+up any process running under this shell to be sent SIGBUS upon 
+an unaligned memory access.
+
+.TP
+.B prctl --unaligned=signal gdb tst
+starts up a gdb session for the program "tst" with the process set to receive
+SIGBUS upon unligned memory access.
+
+.TP
+.B prctl --unaligned=
+displays the current setting for unaligned memory access handling.
+
+.TP
+.B prctl --unaligned= gdb tst
+displays the current setting for unaligned memory access handling and 
+starts up a gdb session for the program "tst".
+
+.SH NOTES
+prctl works on 2.4.0 and above kernels only.
+.P
+--fpemu= option is specific to IPF (Itanium Processor Family, previously 
+known as IA-64) and is supported on kernels 2.4.11 and above. Other 
+architectures and kernels may return "Invalid argument" error.
+
+.SH SEE ALSO
+.BR prctl(2)
+.SH AUTHOR
+Khalid Aziz <khalid_aziz@hp.com>
+.SH LICENSE
+This software is made available under the
+GNU General Public License (GPL) Version 2.\" gpl.html#
+This software comes with
+NO WARRANTY.\" gpl.html#nowarr

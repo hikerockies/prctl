@@ -1,0 +1,114 @@
+# Makefile for prctl
+# Copyright (c) 2000 Hewlett Packard Co
+# Copyright (c) 2000 Khalid Aziz <khalid_aziz@hp.com
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License Version 2 as 
+# published by the Free Software Foundation
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#### Start of system configuration section. ####
+
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+CC = @CC@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+DEFS = @DEFS@
+LIBS = @LIBS@
+CFLAGS = @CFLAGS@
+# If you want debug on by default, use: CFLAGS="-g" ./configure
+LDFLAGS = $(CFLAGS)
+
+prefix = @prefix@
+exec_prefix = $(prefix)
+
+bindir = $(exec_prefix)/bin
+scriptdir = $(bindir)
+# scriptdir is the directory in which shell scripts should be installed
+#datadir = $(prefix)/lib
+#libdir = $(prefix)/lib
+#infodir = $(prefix)/info
+
+# Extension (not including `.') for the installed manual page filenames.
+manext = 1
+# Where to install the manual pages.
+mandir = $(prefix)/share/man/man$(manext)
+# Use manlinks=so to use the .so method instead of hard links
+manlinks = ln
+
+alldirs = $(bindir) $(scriptdir) $(datadir) $(libdir) $(infodir) $(mandir)
+
+#### End of system configuration section. ####
+
+SHELL = /bin/sh
+
+LOADLIBES = $(LIBS)
+
+TAR = tar
+
+SRCS = prctl.c
+
+OBJS = prctl.o
+
+HDRS = 
+
+.c.o:
+	$(CC) -c $(DEFS) $(CFLAGS) $<
+
+default: prctl
+all:     prctl
+
+install: installdirs installbin installman
+
+installdirs:
+	-if test ! -d $(prefix)/share; then \
+	   mkdir -p $(prefix)/share; fi
+	-if test ! -d $(prefix)/share/man; then \
+	   mkdir -p $(prefix)/share/man; fi
+	-for dir in $(alldirs) ; do \
+	   if test ! -d $${dir}; then \
+	      mkdir -p $${dir}; fi; \
+	done
+
+installbin: all
+	$(INSTALL_PROGRAM) prctl $(bindir)/prctl
+	
+installman: prctl.1
+	rm -f $(mandir)/prctl.$(manext)
+	$(INSTALL_DATA) prctl.1 $(mandir)/prctl.$(manext)
+
+uninstall:
+	rm -f $(bindir)/prctl
+	rm -f $(mandir)/prctl.$(manext)
+
+Makefile: Makefile.in ./config.status
+	./config.status
+
+./config.status: configure
+	$(srcdir)/configure --srcdir=$(srcdir) --no-create
+
+
+clean:
+	rm -f *.o prctl
+
+distclean: clean
+	rm -f Makefile config.status config.log config.cache
+
+prctl: Makefile $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+
+# end of file

@@ -1,0 +1,28 @@
+Thu May 18 10:46:10 MDT 2006	Khalid Aziz (khalid_aziz@hp.com)
+	* Updated man page location in Makefile.in
+	* Better error message in case kernel does not support prctl
+	  operations.
+
+Wed Mar  5 11:49:58 MST 2003	Khalid Aziz (khalid_aziz@hp.com)
+	* Added "always-signal" option to --unaligned for ia64.
+
+Wed Oct 17 16:11:59 MDT 2001	Khalid Aziz (khalid_aziz@hp.com)
+	* Added option to set floating point emulation behavior.
+
+Mon Jun  4 17:02:18 MDT 2001	Khalid Aziz (khalid_aziz@hp.com)
+	* Bug fix: Did not recognize "--unaligned=default" as a valid 
+	  command.
+
+Fri Jan 12 10:39:21 MST 2001	Khalid Aziz (khalid_aziz@hp.com)
+	* Removed post-install warning from spec file. Added the removed
+	  warning to NOTES section of man page.
+
+Thu Nov  9 15:09:26 MST 2000	Khalid Aziz (khalid_aziz@hp.com)
+	* Bug fix: If invoked as "prctl --unaligned=signal ./foo -b -a 
+	  -r bletch", options -b, -a and -r are interpreted as options to 
+	  prctl as opposed to options to foo.
+
+Thu Sep 21 10:22:50 MDT 2000	Khalid Aziz (khalid_aziz@hp.com)
+	* Initial release of prctl with support for unaligned memory access
+	  behavior control.
+
