@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2000 Hewlett-Packard Co
  * Copyright (C) 2000 Khalid Aziz <khalid_aziz@hp.com>
+ * Copyright (C) 2014 Khalid Aziz <khalid@gonehiking.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License Version 2 as 
