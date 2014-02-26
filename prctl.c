@@ -119,9 +119,9 @@ int set_unaligned(int prctl_val)
 			}
 		}
 	}
-	if (retval == -1) {
+	if ((retval == -1) && (prctl_val != -1)) {
 		if (errno == EINVAL)
-			fprintf(stderr, "ERROR: Kernel on this platform may not implement this prctl feature.\n");
+			fprintf(stderr, "ERROR: This platform does not implement set_unaligned prctl feature.\n");
 		else
 			fprintf(stderr, "Failed to %s \"unalign\" value: %s\n",
 				((prctl_val==-1)?"get":"set"),strerror(errno));
@@ -179,9 +179,9 @@ int set_fpemu(int prctl_val)
 	 * this platform does not implement PR_GET_FPEMU (It may be
 	 * implemented only on IA64 platforms). 
 	 */
-	if (retval == -1) {
+	if ((retval == -1) && (prctl_val != -1)) {
 		if (errno == EINVAL)
-			fprintf(stderr, "ERROR: Kernel on this platform may not implement this prctl feature.\n");
+			fprintf(stderr, "ERROR: This platform does not implement FPEMU prctl feature.\n");
 		else
 			fprintf(stderr, "Failed to %s \"fpemu\" value: %s\n",
 				((prctl_val==-1)?"get":"set"),strerror(errno));
@@ -286,7 +286,7 @@ int main(int argc, char **argv)
 	/*
 	 * Is there a command on the command line? If there is, there 
 	 * there should be atleast one other option on the line and it
-	 * should be somethingother than -v.
+	 * should be something other than -v.
 	 */
 	cmd_start = optind;
 	if ((cmd_start == 1) || ((cmd_start == 2) && (verbose))) {
@@ -299,8 +299,11 @@ int main(int argc, char **argv)
 	 * and simply display current settings.
 	 */
 	if (display_all) {
+		printf("Current settings for supported prctl operations:\n");
 		set_unaligned(-1);
 		set_fpemu(-1);
+		printf("\n");
+		exit(0);
 	} else {
 		/*
 		 * Now set the correct prctl options if needed
@@ -375,4 +378,6 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
+
+	exit(0);
 }
