@@ -1,4 +1,4 @@
-%define version 1.5
+%define version 1.6
 
 Summary: Utility to perform process operations
 Name: prctl
@@ -39,6 +39,10 @@ make install prefix=$RPM_BUILD_ROOT/usr/local
 /usr/local/man/man1/prctl.1
 
 %changelog
+* Wed Feb 26 2014	Khalid Aziz (khalid.aziz@oracle.com)
+- Improved messages and suppressed unnecessary error messages
+- Added support for PR_MCE_KILL
+
 * Thu May 18 2006	Khalid Aziz (khalid_aziz@hp.com)
 - Updated man page location in Makefile.in
 - Better error message in case kernel does not support prctl operations.

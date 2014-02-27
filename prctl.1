@@ -17,21 +17,34 @@ where \fB<options>\fP are:
 .RB "\|" --unaligned=[silent|signal|always-signal|default] "\|"
 .P
 .RB "\|" --fpemu=[silent|signal|default] "\|"
+.P
+.RB "\|" --mcekill=[early|late|default] "\|"
 .SH DESCRIPTION
 \fBprctl\fP
 allows you to query or control certain process behavior. 
-Supported options are handling of unaligned memory accesses 
-and floating point assistance faults by a process.
+Supported options are:
+.P
+\fBUnaligned memory access:\fP
 When a process performs an unaligned memory access, by default
 the kernel would emulate the unaligned access correctly and 
 log the unaligned access in syslog. This behavior can be changed 
 so the kernel could either emulate the unaligned access correctly
-without logging an error or send SIGBUS to the process. Similarly
+without logging an error ("silent") or send SIGBUS to the process
+("signal" and "always-signal"). "always-signal" is available on ia64
+only.
+.P
+\fBFloating point assistance faults:\fP
 when a process encounters a floating point assist fault, kernel
 would invoke floating point emulator and log the floating point
 assist fault. This behavior can be changed so the kernel could
-either emulate floating point operation without logging an error or send
-SIGFPE to the offending process.
+either emulate floating point operation without logging an error 
+("silent") or send SIGFPE to the offending process ("signal").
+.P
+\fBMachine check memory corruption kill policy:\fP
+If a hardware memeory corruption is detected inside a thread's address
+space, mmemory corruption kill policy determines whether the thread
+received SIGBUS as soon as corruption is detected ("early"), when it
+accesses corrupted memory ("late"), or use system wide default.
 .P
 \fBprctl\fP
 can optionally be followed by a command. If a command is specified, 
@@ -116,7 +129,7 @@ architectures and kernels may return "Invalid argument" error.
 .SH SEE ALSO
 .BR prctl(2)
 .SH AUTHOR
-Khalid Aziz <khalid_aziz@hp.com>
+Khalid Aziz <khalid.aziz@oracle.com>
 .SH LICENSE
 This software is made available under the
 GNU General Public License (GPL) Version 2.\" gpl.html#

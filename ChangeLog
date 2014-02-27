@@ -1,8 +1,16 @@
+V1.6:
+Wed Feb 26 10:39:10 MST 2014	Khalid Aziz (khalid.aziz@oracle.com)
+	* Improved messages and suppressed unnecessary error messages
+	* Added support for PR_MCE_KILL
+
+---------------------------
+V1.5:
 Thu May 18 10:46:10 MDT 2006	Khalid Aziz (khalid_aziz@hp.com)
 	* Updated man page location in Makefile.in
 	* Better error message in case kernel does not support prctl
 	  operations.
 
+---------------------------
 Wed Mar  5 11:49:58 MST 2003	Khalid Aziz (khalid_aziz@hp.com)
 	* Added "always-signal" option to --unaligned for ia64.
 

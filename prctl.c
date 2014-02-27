@@ -30,7 +30,7 @@
 #include <string.h>
 
 /* Version */
-#define VERSION	"1.5"
+#define VERSION	"1.6"
 
 /* Shell to fall back on if no other shell can be found */
 #define DEFAULT_SHELL	"/bin/bash"
@@ -41,6 +41,7 @@
 struct option longopts[] = {
 	{"unaligned", 1, (int *)0, 'u'},
 	{"fpemu", 1, (int *)0, 'f'},
+	{"mcekill", 1, (int *)0, 'm'},
 	{"version", 0, (int *)0, 'V'},
 	{"help", 0, (int *)0, 'h'},
 	{0, 0, (int *)0, 0}
@@ -66,6 +67,7 @@ usage(char *progname)
 	printf("       --unaligned=[silent|signal|default]\n");
 #endif
 	printf("       --fpemu=[silent|signal|default]\n");
+	printf("       --mcekill=[early|late|default]\n");
 }
 
 int set_unaligned(int prctl_val)
@@ -119,12 +121,18 @@ int set_unaligned(int prctl_val)
 			}
 		}
 	}
-	if ((retval == -1) && (prctl_val != -1)) {
-		if (errno == EINVAL)
-			fprintf(stderr, "ERROR: This platform does not implement set_unaligned prctl feature.\n");
-		else
+	if (retval == -1) {
+		if (errno == EINVAL) {
+			/*
+			 * print an error message only if we were trying
+			 * to set this value.
+			 */
+			if (prctl_val != -1)
+				fprintf(stderr, "ERROR: This platform does not implement set_unaligned prctl feature.\n");
+		} else {
 			fprintf(stderr, "Failed to %s \"unalign\" value: %s\n",
 				((prctl_val==-1)?"get":"set"),strerror(errno));
+		}
 	}
 	return(retval);
 }
@@ -179,24 +187,93 @@ int set_fpemu(int prctl_val)
 	 * this platform does not implement PR_GET_FPEMU (It may be
 	 * implemented only on IA64 platforms). 
 	 */
-	if ((retval == -1) && (prctl_val != -1)) {
-		if (errno == EINVAL)
-			fprintf(stderr, "ERROR: This platform does not implement FPEMU prctl feature.\n");
-		else
+	if (retval == -1) {
+		if (errno == EINVAL) {
+			/*
+			 * print an error message only if we were trying
+			 * to set this value.
+			 */
+			if (prctl_val != -1)
+				fprintf(stderr, "ERROR: This platform does not implement set_fpemu prctl feature.\n");
+		} else {
 			fprintf(stderr, "Failed to %s \"fpemu\" value: %s\n",
 				((prctl_val==-1)?"get":"set"),strerror(errno));
+		}
 	}
 	return(retval);
 }
+
+int set_mcekill(int prctl_val)
+{
+	int killval, retval;
+	int umask;
+
+	/*
+	 * Check if we need to display the value or set it.
+	 */
+	if (prctl_val == -1) {
+		killval = prctl(PR_MCE_KILL_GET, 0, 0, 0, 0);
+		printf("%-13s= ", "mcekill");
+		switch (killval) {
+		case PR_MCE_KILL_DEFAULT:
+			printf("default\n");
+			break;
+
+		case PR_MCE_KILL_EARLY:
+			printf("early\n");
+			break;
+
+		case PR_MCE_KILL_LATE:
+			printf("late\n");
+			break;
+		}
+	} else {
+		if ((retval = prctl(PR_MCE_KILL, PR_MCE_KILL_SET,
+						prctl_val, 0, 0)) != -1) {
+			if (verbose) {
+				printf("Set \"mcekill\" to ");
+				switch (prctl_val) {
+				case PR_MCE_KILL_DEFAULT:
+					printf("\"default\"\n");
+					break;
+
+				case PR_MCE_KILL_EARLY:
+					printf("\"early\"\n");
+					break;
+
+				case PR_MCE_KILL_LATE:
+					printf("\"late\"\n");
+					break;
+				}
+			}
+		}
+	}
+	if (retval == -1) {
+		if (errno == EINVAL) {
+			/*
+			 * print an error message only if we were trying
+			 * to set this value.
+			 */
+			if (prctl_val != -1)
+				fprintf(stderr, "ERROR: This platform does not implement set_mce_kill prctl feature.\n");
+		} else {
+			fprintf(stderr, "Failed to %s \"mcekill\" value: %s\n",
+				((prctl_val==-1)?"get":"set"),strerror(errno));
+		}
+	}
+	return(retval);
+}
+
 int main(int argc, char **argv)
 {
 	int opt, cmd_start;
 	char *progname;
 	char fullpath[512];
 	char shellname[128];
-	int unaligned_val=-99;
-	int fpemu_val=-99;
-	int always_signal=0;
+	int unaligned_val = -99;
+	int fpemu_val = -99;
+	int mcekill_val = -99;
+	int always_signal = 0;
 	int display = 0;
 	int display_all = 0;
 	int umask;
@@ -256,6 +333,22 @@ int main(int argc, char **argv)
 			}
 			break;
 
+		case 'm':
+			if (strcmp(optarg, "early") == 0) {
+				mcekill_val = PR_MCE_KILL_EARLY;
+			} else if (strcmp(optarg, "late") == 0) {
+				mcekill_val = PR_MCE_KILL_LATE;
+			} else if (strcmp(optarg, "default") == 0) {
+				mcekill_val = PR_MCE_KILL_DEFAULT;
+			} else if (optarg[0] == 0) {
+				mcekill_val = -1;
+				display = 1;
+			} else {
+				usage(progname);
+				exit(1);
+			}
+			break;
+
 		case 'q':
 			display_all = 1;
 			display = 1;
@@ -302,6 +395,7 @@ int main(int argc, char **argv)
 		printf("Current settings for supported prctl operations:\n");
 		set_unaligned(-1);
 		set_fpemu(-1);
+		set_mcekill(-1);
 		printf("\n");
 		exit(0);
 	} else {
@@ -324,6 +418,11 @@ int main(int argc, char **argv)
 				exit(1);
 			}
 		}
+		if (mcekill_val != -99) {
+			if (set_mcekill(mcekill_val) == -1) {
+				exit(1);
+			}
+		}
 	}
 	
 	/*
@@ -339,6 +438,7 @@ int main(int argc, char **argv)
 			exit(0);
 		}
 
+		printf("Starting a shell\n");
 		strcpy(shellname, getenv("SHELL"));
 		
 		/*
