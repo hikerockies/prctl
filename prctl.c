@@ -26,11 +26,11 @@
 #include <getopt.h>
 #include <errno.h>
 #include <pwd.h>
-#include <linux/prctl.h>
+#include <sys/prctl.h>
 #include <string.h>
 
 /* Version */
-#define VERSION	"1.6"
+#define VERSION	"1.7"
 
 /* Shell to fall back on if no other shell can be found */
 #define DEFAULT_SHELL	"/bin/bash"
@@ -50,11 +50,13 @@ struct option longopts[] = {
 /* Verbose mode */
 int verbose=0;
 
+void
 print_version(char *progname)
 {
 	printf("%s version %s\n", progname, VERSION);
 }
 
+void
 usage(char *progname)
 {
 	print_version(progname);
@@ -70,7 +72,8 @@ usage(char *progname)
 	printf("       --mcekill=[early|late|default]\n");
 }
 
-int set_unaligned(int prctl_val)
+int
+set_unaligned(int prctl_val)
 {
 	int alignval, retval;
 	int umask;
@@ -137,7 +140,8 @@ int set_unaligned(int prctl_val)
 	return(retval);
 }
 
-int set_fpemu(int prctl_val)
+int
+set_fpemu(int prctl_val)
 {
 	int fpemuval, retval;
 
@@ -203,7 +207,8 @@ int set_fpemu(int prctl_val)
 	return(retval);
 }
 
-int set_mcekill(int prctl_val)
+int
+set_mcekill(int prctl_val)
 {
 	int killval, retval;
 	int umask;
@@ -264,7 +269,8 @@ int set_mcekill(int prctl_val)
 	return(retval);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	int opt, cmd_start;
 	char *progname;
@@ -371,7 +377,7 @@ int main(int argc, char **argv)
 		case '?':
 			fprintf(stderr, "%s: invalid option - %c\n", 
 					progname, optopt);
-			exit (1);
+			exit(1);
 			break;
 		}
 	}
