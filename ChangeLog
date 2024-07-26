@@ -1,3 +1,10 @@
+V1.7:
+Fri Jul 26 15:55:24 MDT 2024	Khalid Aziz (khalid@gonehiking.org)
+	* Added missing defines to Makefile.in
+	* Replace pre-generated configure with configure.ac 
+	* Added missing function types in prctl.c
+
+---------------------------
 V1.6:
 Wed Feb 26 10:39:10 MST 2014	Khalid Aziz (khalid.aziz@oracle.com)
 	* Improved messages and suppressed unnecessary error messages
