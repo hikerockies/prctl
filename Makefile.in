@@ -29,9 +29,10 @@ INSTALL_DATA = @INSTALL_DATA@
 
 DEFS = @DEFS@
 LIBS = @LIBS@
+CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
 # If you want debug on by default, use: CFLAGS="-g" ./configure
-LDFLAGS = $(CFLAGS)
+LDFLAGS = @LDFLAGS@
 
 prefix = @prefix@
 exec_prefix = $(prefix)
@@ -106,7 +107,8 @@ clean:
 	rm -f *.o prctl
 
 distclean: clean
-	rm -f Makefile config.status config.log config.cache
+	rm -f Makefile config.status config.log config.cache config.h configure configure~ config.h.in install-sh
+	rm -fr autom4te.cache
 
 prctl: Makefile $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
