@@ -373,8 +373,8 @@ main(int argc, char **argv)
 			break;
 
 		case '?':
-			fprintf(stderr, "%s: invalid option - %c\n", 
-					progname, optopt);
+			fprintf(stderr, "%s: invalid option: %s\n",
+					progname, argv[optind - 1]);
 			exit(1);
 			break;
 		}
