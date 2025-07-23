@@ -274,7 +274,7 @@ main(int argc, char **argv)
 {
 	int opt, cmd_start;
 	char const *progname;
-	char shellname[128];
+	char const *shellname;
 	int unaligned_val = -99;
 	int fpemu_val = -99;
 	int mcekill_val = -99;
@@ -443,31 +443,27 @@ main(int argc, char **argv)
 		}
 
 		printf("Starting a shell\n");
-		strcpy(shellname, getenv("SHELL"));
-		
+		shellname = getenv("SHELL");
+
 		/*
 		 * Make sure SHELL environment variable is not unset. If it
-		 * is, start bash.
+		 * is, start user login shell or bash.
 		 */
-		if (shellname[0] == 0) {
+		if (shellname == NULL) {
 			struct passwd *pwd_entry;
 
 			pwd_entry = getpwuid(getuid());
-			if (pwd_entry == NULL) {
-				strcpy(shellname, DEFAULT_SHELL);
+			if (pwd_entry != NULL && pwd_entry->pw_shell != NULL) {
+				shellname = pwd_entry->pw_shell;
 			} else {
-				if (pwd_entry->pw_shell != NULL) {
-					strcpy(shellname, pwd_entry->pw_shell);
-				} else {
-					strcpy(shellname, DEFAULT_SHELL);
-				}
+				shellname = DEFAULT_SHELL;
 			}
 		}
 
 		/*
 		 * Now exec the shell
 		 */
-		if (execlp(shellname, (char *)shellname, (char *) 0) == -1) {
+		if (execlp(shellname, shellname, (char *) 0) == -1) {
 			fprintf(stderr, "Failed to exec the shell: %s\n",
 				strerror(errno));
 			exit(1);
