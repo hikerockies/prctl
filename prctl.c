@@ -51,13 +51,13 @@ struct option longopts[] = {
 int verbose=0;
 
 void
-print_version(char *progname)
+print_version(char const *progname)
 {
 	printf("%s version %s\n", progname, VERSION);
 }
 
 void
-usage(char *progname)
+usage(char const *progname)
 {
 	print_version(progname);
 	printf("Usage: %s [-v] [-h|--help] [--version]\n", progname);
@@ -273,8 +273,7 @@ int
 main(int argc, char **argv)
 {
 	int opt, cmd_start;
-	char *progname;
-	char fullpath[512];
+	char const *progname;
 	char shellname[128];
 	int unaligned_val = -99;
 	int fpemu_val = -99;
@@ -284,11 +283,10 @@ main(int argc, char **argv)
 	int display_all = 0;
 	int umask;
 
-	strcpy(fullpath, argv[0]);
-	if ((progname = strrchr(fullpath, '/')) != NULL) {
+	if ((progname = strrchr(argv[0], '/')) != NULL) {
 		progname++;
 	} else {
-		progname = fullpath;
+		progname = argv[0];
 	}
 
 	/*
