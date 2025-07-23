@@ -297,8 +297,8 @@ main(int argc, char **argv)
 		exit(1);
 	}
 	opterr = 0;
-	while ((opt = getopt_long(argc, argv, "+qhv", longopts, 
-					(int *) NULL)) != EOF) {
+	while ((opt = getopt_long(argc, argv, "+qhv", longopts,
+					(int *) NULL)) != -1) {
 		switch (opt) {
 		case 'u':
 			if (strcmp(optarg, "silent") == 0) {
