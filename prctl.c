@@ -297,8 +297,8 @@ main(int argc, char **argv)
 		exit(1);
 	}
 	opterr = 0;
-	while ((opt = getopt_long(argc, argv, "+qhv", longopts, 
-					(int *) NULL)) != EOF) {
+	while ((opt = getopt_long(argc, argv, "+qhv", longopts,
+					(int *) NULL)) != -1) {
 		switch (opt) {
 		case 'u':
 			if (strcmp(optarg, "silent") == 0) {
@@ -373,8 +373,8 @@ main(int argc, char **argv)
 			break;
 
 		case '?':
-			fprintf(stderr, "%s: invalid option - %c\n", 
-					progname, optopt);
+			fprintf(stderr, "%s: invalid option: %s\n",
+					progname, argv[optind - 1]);
 			exit(1);
 			break;
 		}
